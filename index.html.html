@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Séquenceur</title>
+    <style>
+        body { 
+            background: #000; 
+            color: #333; 
+            font-family: sans-serif; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center;
+        }
+        #launcher { 
+            position: absolute;
+            width: 100%; 
+            height: 100%; 
+            background: transparent; 
+            border: none; 
+            cursor: pointer; 
+            z-index: 2;
+        }
+        #help-box {
+            display: none;
+            z-index: 1;
+            padding: 20px;
+            border: 1px solid #d63031;
+            background: #1a1a1a;
+            color: #fab1a0;
+            border-radius: 8px;
+            max-width: 450px;
+        }
+        h1 { font-size: 2rem; letter-spacing: 2px; text-transform: lowercase; }
+        kbd {
+            background: #444;
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="launcher"></button>
+
+    <h1 id="main-text">cliquer</h1>
+
+    <div id="help-box">
+        <h3>⚠️ Fenêtres bloquées</h3>
+        <p>Pour continuer :</p>
+        <p>1. Cliquez sur l'icône <kbd>Pop-up bloqué</kbd> à droite de la barre d'adresse.</p>
+        <p>2. Sélectionnez <strong>"Toujours autoriser..."</strong>.</p>
+        <p>3. Actualisez et cliquez à nouveau.</p>
+    </div>
+
+    <script>
+        // Liste de 35 sites pour respecter la règle du "pas plus de 3 fois"
+        const sites = [
+            'https://www.google.com', 'https://www.wikipedia.org', 'https://www.youtube.com', 
+            'https://www.nasa.gov', 'https://www.reddit.com', 'https://www.imdb.com',
+            'https://www.github.com', 'https://www.bbc.com', 'https://www.amazon.com',
+            'https://www.instagram.com', 'https://www.apple.com', 'https://www.microsoft.com',
+            'https://www.linkedin.com', 'https://www.twitch.tv', 'https://www.netflix.com',
+            'https://www.spotify.com', 'https://www.pinterest.com', 'https://www.ebay.com',
+            'https://www.nytimes.com', 'https://www.nationalgeographic.com', 'https://www.stackoverflow.com',
+            'https://www.adobe.com', 'https://www.ted.com', 'https://www.quora.com',
+            'https://www.medium.com', 'https://www.booking.com', 'https://www.tripadvisor.com',
+            'https://www.dailymotion.com', 'https://www.vimeo.com', 'https://www.deviantart.com',
+            'https://www.behance.net', 'https://www.discord.com', 'https://www.canva.com',
+            'https://www.dropbox.com', 'https://www.zoom.us'
+        ];
+
+        let count = 0;
+        const limit = 100;
+
+        function turboLaunch() {
+            if (count >= limit) return;
+
+            const win = window.open(sites[count % sites.length], '_blank');
+
+            if (win) {
+                count++;
+                setTimeout(turboLaunch, 100);
+            } else {
+                document.getElementById('help-box').style.display = 'block';
+                document.getElementById('main-text').style.display = 'none';
+            }
+        }
+
+        document.getElementById('launcher').onclick = function() {
+            this.style.display = 'none';
+            document.getElementById('main-text').style.opacity = '0.05'; 
+            turboLaunch();
+        };
+    </script>
+</body>
+</html>
