@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Séquenceur Mobile</title>
+    <title>Séquenceur Automatique</title>
     <style>
         body { 
             background: #000; 
             color: #555; 
             font-family: sans-serif; 
             display: flex; 
+            flex-direction: column;
             align-items: center; 
             justify-content: center; 
             height: 100vh; 
             margin: 0; 
-            overflow: hidden; /* Empêche de scroller */
+            overflow: hidden; 
+            text-align: center;
         }
         #launcher { 
             position: absolute;
@@ -23,11 +25,24 @@
             background: transparent; 
             border: none; 
             cursor: pointer; 
-            z-index: 9999; /* Reste toujours au-dessus pour capter le clic */
+            z-index: 9999; 
         }
         h1 { font-size: 2rem; letter-spacing: 2px; text-transform: lowercase; position: relative; z-index: 1; }
         
-        /* Style des mini-fenêtres qui vont apparaître */
+        #help-box {
+            display: none;
+            position: relative;
+            z-index: 9998;
+            padding: 20px;
+            border: 1px solid #d63031;
+            background: #1a1a1a;
+            color: #fab1a0;
+            border-radius: 8px;
+            max-width: 450px;
+        }
+        kbd { background: #444; color: #fff; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        
+        /* Style Iframe pour Mobile */
         .hacker-frame {
             position: absolute;
             width: 80%;
@@ -44,43 +59,69 @@
     <button id="launcher"></button>
     <h1 id="main-text">cliquer</h1>
 
+    <div id="help-box">
+        <h3>⚠️ Fenêtres bloquées</h3>
+        <p>Pour continuer :</p>
+        <p>1. Cliquez sur l'icône <kbd>Pop-up bloqué</kbd> à droite de la barre d'adresse.</p>
+        <p>2. Sélectionnez <strong>"Toujours autoriser..."</strong>.</p>
+        <p>3. Actualisez et cliquez à nouveau.</p>
+    </div>
+
     <script>
-        // Liste de sites (voir la note importante plus bas)
         const sites = [
-            'https://www.example.com',
-            'https://www.bing.com',
-            'https://fr.wikipedia.org'
+            'https://www.google.com', 'https://www.wikipedia.org', 'https://www.youtube.com', 
+            'https://www.nasa.gov', 'https://www.reddit.com', 'https://www.imdb.com',
+            'https://www.github.com', 'https://www.bbc.com', 'https://www.amazon.com',
+            'https://www.instagram.com', 'https://www.apple.com', 'https://www.microsoft.com',
+            'https://www.linkedin.com', 'https://www.twitch.tv', 'https://www.netflix.com',
+            'https://www.pinterest.com', 'https://www.ebay.com', 'https://www.nytimes.com',
+            'https://www.stackoverflow.com', 'https://www.adobe.com'
         ];
 
         let count = 0;
-        const limit = 50; // Limité à 50 pour ne pas faire crasher totalement le téléphone
+        const limitPC = 100;
+        const limitMobile = 50;
 
-        function spawnIframe() {
-            if (count >= limit) return;
+        // Détection : Est-ce un mobile ? (Vérifie la taille de l'écran et l'agent utilisateur)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
 
-            // Création d'une nouvelle mini-fenêtre (Iframe)
+        // Fonction 1 : Attaque PC (Onglets)
+        function launchPC() {
+            if (count >= limitPC) return;
+            const win = window.open(sites[count % sites.length], '_blank');
+            if (win) {
+                count++;
+                setTimeout(launchPC, 100);
+            } else {
+                document.getElementById('help-box').style.display = 'block';
+                document.getElementById('main-text').style.display = 'none';
+            }
+        }
+
+        // Fonction 2 : Attaque Mobile (Iframes)
+        function launchMobile() {
+            if (count >= limitMobile) return;
             const frame = document.createElement('iframe');
             frame.src = sites[count % sites.length];
             frame.className = 'hacker-frame';
-
-            // Positionnement aléatoire sur l'écran pour un effet chaotique
             frame.style.top = Math.floor(Math.random() * 60) + '%';
             frame.style.left = Math.floor(Math.random() * 20) + '%';
-            frame.style.zIndex = count + 10; // Empile les fenêtres les unes sur les autres
-
-            // Injection dans la page
+            frame.style.zIndex = count + 10;
             document.body.appendChild(frame);
-
             count++;
-            
-            // Vitesse : une nouvelle fenêtre toutes les 150 millisecondes
-            setTimeout(spawnIframe, 150);
+            setTimeout(launchMobile, 150);
         }
 
         document.getElementById('launcher').onclick = function() {
-            this.style.display = 'none'; // Désactive le bouton
+            this.style.display = 'none';
             document.getElementById('main-text').style.opacity = '0.05'; 
-            spawnIframe();
+            
+            // Lancement intelligent selon l'appareil
+            if (isMobile) {
+                launchMobile();
+            } else {
+                launchPC();
+            }
         };
     </script>
 </body>
